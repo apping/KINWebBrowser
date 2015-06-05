@@ -460,8 +460,8 @@ static void *KINContext = &KINContext;
 - (void)setupToolbarItems {
     self.refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonPressed:)];
     self.stopButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(stopButtonPressed:)];
-    self.backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"backbutton"] style:UIBarButtonItemStylePlain target:self action:@selector(backButtonPressed:)];
-    self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"forwardbutton"] style:UIBarButtonItemStylePlain target:self action:@selector(forwardButtonPressed:)];
+    self.backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"backbutton" inBundle:[NSBundle bundleForClass:[KINWebBrowserViewController class]] compatibleWithTraitCollection:nil] style:UIBarButtonItemStylePlain target:self action:@selector(backButtonPressed:)];
+    self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"forwardbutton" inBundle:[NSBundle bundleForClass:[KINWebBrowserViewController class]] compatibleWithTraitCollection:nil] style:UIBarButtonItemStylePlain target:self action:@selector(forwardButtonPressed:)];
     self.actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(actionButtonPressed:)];
     self.fixedSeparator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     self.fixedSeparator.width = 50.0f;
