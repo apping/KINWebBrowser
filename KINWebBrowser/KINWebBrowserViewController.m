@@ -104,7 +104,13 @@ static void *KINContext = &KINContext;
 - (id)initWithConfiguration:(WKWebViewConfiguration *)configuration {
     if (!self) self = [super init];
     if(self) {
-        if([WKWebView class]) {
+        
+        BOOL preventWKWebViewFallover = NO;
+#ifdef KIN_PREVENT_WKWEBVIEW_FALLOVER
+        preventWKWebViewFallover = YES;
+#endif
+        
+        if([WKWebView class] && !preventWKWebViewFallover) {
             if(configuration) {
                 self.wkWebView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration];
             } else {
@@ -119,9 +125,9 @@ static void *KINContext = &KINContext;
         self.showsPageTitleInNavigationBar = YES;
         
         _HTTPHeaders = [NSMutableDictionary new];
-
+        
         self.externalAppPermissionAlertView = [[UIAlertView alloc] initWithTitle:@"Leave this app?" message:@"This web page is trying to open an outside app. Are you sure you want to open it?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Open App", nil];
-
+        
     }
     return self;
 }
@@ -132,9 +138,7 @@ static void *KINContext = &KINContext;
     if (!_progressView) {
         _progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
         [_progressView setTrackTintColor:[UIColor colorWithWhite:1.0f alpha:0.0f]];
-        [_progressView setFrame:CGRectMake(0, self.navigationController.navigationBar.frame.size.height-_progressView.frame.size.height, self.view.frame.size.width, _progressView.frame.size.height)];
-        [_progressView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin];
-        [self.navigationController.navigationBar addSubview:_progressView];
+        [_progressView setTranslatesAutoresizingMaskIntoConstraints:NO];
     }
     return _progressView;
 }
@@ -152,6 +156,12 @@ static void *KINContext = &KINContext;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self.view addSubview:self.progressView];
+    NSDictionary *viewsDictionary = @{@"progressView" : self.progressView,
+                                      @"topLayoutGuide" : self.topLayoutGuide};
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[progressView]|" options:0 metrics:nil views:viewsDictionary]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[topLayoutGuide][progressView]" options:0 metrics:nil views:viewsDictionary]];
     
     self.previousNavigationControllerToolbarHidden = self.navigationController.toolbarHidden;
     self.previousNavigationControllerNavigationBarHidden = self.navigationController.navigationBarHidden;
@@ -175,6 +185,13 @@ static void *KINContext = &KINContext;
         [self.uiWebView.scrollView setAlwaysBounceVertical:YES];
         [self.view addSubview:self.uiWebView];
     }
+}
+
+-(void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    
+    [self.view bringSubviewToFront:self.progressView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
